@@ -34,8 +34,9 @@
     .bonus{box-shadow:0 12px 30px rgba(43,22,12,.1)}.bonus-image{width:100%;height:auto;aspect-ratio:auto;object-fit:contain;background:#1d2745}
     .who{box-shadow:0 7px 20px rgba(43,22,12,.05)}.who b{font-size:1.04rem}
     .pricing{grid-template-columns:1fr 1.08fr;gap:30px;max-width:940px}.price-card.featured{border:3px solid #d99a20;transform:scale(1.035);background:linear-gradient(165deg,#fffdf7,#fff7df);box-shadow:0 0 0 7px rgba(220,167,68,.18),0 35px 80px rgba(75,42,8,.3)}.featured .tag{top:-17px;background:linear-gradient(90deg,#f1c55d,#d99a20);padding:8px 18px;box-shadow:0 8px 20px rgba(119,72,10,.25)}.featured .cta{background:linear-gradient(180deg,#299d51,#136733);box-shadow:0 9px 0 #0c4923,0 18px 32px rgba(23,106,54,.28)}.guarantee{margin-top:38px}
+    .purchase-toast{position:fixed;z-index:1000;left:18px;bottom:18px;width:min(355px,calc(100% - 36px));display:grid;grid-template-columns:46px 1fr 28px;align-items:center;gap:11px;padding:13px 12px;background:#fff;border:1px solid #ead6ae;border-radius:15px;box-shadow:0 18px 50px rgba(43,22,12,.24);opacity:0;transform:translateY(24px);pointer-events:none;transition:opacity .35s ease,transform .35s ease}.purchase-toast.show{opacity:1;transform:none;pointer-events:auto}.purchase-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,#f7dfae,#eabf67);font-size:1.35rem}.purchase-copy{font-size:.83rem;line-height:1.3;color:#6f594b}.purchase-copy strong{display:block;color:var(--ink);font-size:.96rem;margin-bottom:2px}.purchase-close{align-self:start;border:0;background:transparent;color:#8a7668;font-size:1.2rem;line-height:1;padding:2px;cursor:pointer}.purchase-close:hover{color:var(--ink)}
     @media(max-width:820px){.price-card.featured{transform:none}.pricing{grid-template-columns:1fr}.preview{grid-template-columns:1fr}}
-    @media(max-width:540px){.hero .subheadline{font-size:1rem}.hero .mock{border-radius:12px;box-shadow:0 18px 38px rgba(40,22,63,.2),0 0 0 3px rgba(255,255,255,.7)}.hero .checks{display:grid;width:100%;text-align:left}.hero .checks li{border-radius:12px}.carousel-track img{width:260px}.book-panel{padding:12px;min-height:260px}}
+    @media(max-width:540px){.hero .subheadline{font-size:1rem}.hero .mock{border-radius:12px;box-shadow:0 18px 38px rgba(40,22,63,.2),0 0 0 3px rgba(255,255,255,.7)}.hero .checks{display:grid;width:100%;text-align:left}.hero .checks li{border-radius:12px}.carousel-track img{width:260px}.book-panel{padding:12px;min-height:260px}.purchase-toast{left:11px;bottom:11px;width:calc(100% - 22px)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fade{opacity:1;transform:none;transition:none}.cta{transition:none}.carousel-track{animation:none}}
   </style>
 </head>
@@ -183,9 +184,43 @@
 
   <footer><div class="wrap">© 2026 77 Chaves de Manifestação • Produto digital de uso pessoal</div></footer>
 
+  <aside class="purchase-toast" id="purchaseToast" role="status" aria-live="polite" aria-hidden="true">
+    <div class="purchase-icon" aria-hidden="true">🔑</div>
+    <div class="purchase-copy"><strong id="purchaseName"></strong><span>garantiu acesso às 77 Chaves de Manifestação</span></div>
+    <button class="purchase-close" id="purchaseClose" type="button" aria-label="Fechar notificação">×</button>
+  </aside>
+
   <script>
     const observer=new IntersectionObserver((entries)=>entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add('in')}),{threshold:.12});
     document.querySelectorAll('.fade').forEach(el=>observer.observe(el));
+
+    const customerNames=['Ana Ribeiro','Beatriz Almeida','Camila Rodrigues','Daniela Martins','Fernanda Oliveira','Juliana Ferreira','Larissa Gomes','Mariana Costa','Patrícia Souza','Vanessa Carvalho','Carlos Henrique','Eduardo Barbosa','Gabriel Santos','Leonardo Rocha','Lucas Pereira','Marcelo Teixeira','Pedro Moreira','Rafael Lima','Ricardo Nunes','Sérgio Azevedo'];
+    const purchaseToast=document.getElementById('purchaseToast');
+    const purchaseName=document.getElementById('purchaseName');
+    const purchaseClose=document.getElementById('purchaseClose');
+    let customerIndex=Math.floor(Math.random()*customerNames.length);
+    let hideToastTimer;
+    let nextToastTimer;
+
+    function showPurchaseToast(){
+      purchaseName.textContent=customerNames[customerIndex];
+      customerIndex=(customerIndex+1)%customerNames.length;
+      purchaseToast.classList.add('show');
+      purchaseToast.setAttribute('aria-hidden','false');
+      hideToastTimer=setTimeout(()=>{
+        purchaseToast.classList.remove('show');
+        purchaseToast.setAttribute('aria-hidden','true');
+        nextToastTimer=setTimeout(showPurchaseToast,8000);
+      },4500);
+    }
+
+    nextToastTimer=setTimeout(showPurchaseToast,5000);
+    purchaseClose.addEventListener('click',()=>{
+      clearTimeout(hideToastTimer);
+      clearTimeout(nextToastTimer);
+      purchaseToast.classList.remove('show');
+      purchaseToast.setAttribute('aria-hidden','true');
+    });
   </script>
 </body>
 </html>
